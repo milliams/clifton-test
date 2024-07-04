@@ -76,7 +76,7 @@ jobs:
         run: cross build --target=${{ matrix.target }} --release
         if: matrix.cross
       - name: Generate SBOM
-        rum: cargo sbom --output-format=spdx_json_2_3 > sbom.spdx.json
+        run: cargo sbom --output-format=spdx_json_2_3 > sbom.spdx.json
       - name: Rename assets
         run: cp target/${{ matrix.target }}/release/${{ matrix.output }} ${{ matrix.asset-name }}
       - name: Compress output
