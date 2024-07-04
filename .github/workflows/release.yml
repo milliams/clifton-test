@@ -97,6 +97,7 @@ jobs:
     permissions:
       contents: read
       attestations: write
+      id-token: write
 
   make-release:
     name: Make release ${{ needs.tag-release.outputs.ref }}
