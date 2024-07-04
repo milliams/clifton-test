@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 [package]
-name = "clifton-test"
+name = "clifton"
 version = "0.1.0"
 edition = "2021"
 build = "build.rs"
