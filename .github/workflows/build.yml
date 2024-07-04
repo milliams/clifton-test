@@ -68,18 +68,12 @@ jobs:
       - name: Install cross
         uses: taiki-e/install-action@cross
         if: matrix.cross
-      - name: Install cargo-sbom
-        uses: taiki-e/install-action@v2
-        with:
-          tool: cargo-sbom
       - name: Build
         run: cargo build --target=${{ matrix.target }} --release
         if: ${{ ! matrix.cross }}
       - name: Build
         run: cross build --target=${{ matrix.target }} --release
         if: matrix.cross
-      - name: Generate SBOM
-        run: cargo sbom --output-format=spdx_json_2_3 > sbom.spdx.json
       - name: Rename assets
         run: cp target/${{ matrix.target }}/release/${{ matrix.output }} ${{ matrix.asset-name }}
       - name: Compress output
@@ -89,6 +83,14 @@ jobs:
           tar xvf "upx-${upx_ver}-amd64_linux.tar.xz"
           upx-${upx_ver}-amd64_linux/upx ${{ matrix.asset-name }}
         if: ${{ matrix.compress-binary }}
+      - name: Install cargo-sbom
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-sbom
+        if: github.workflow == 'Build release'
+      - name: Generate SBOM
+        run: cargo sbom --output-format=spdx_json_2_3 > sbom.spdx.json
+        if: github.workflow == 'Build release'
       - name: Attest SBOM  # TODO Publish the SBOM
         uses: actions/attest-sbom@v1
         with:
