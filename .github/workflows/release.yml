@@ -85,7 +85,7 @@ jobs:
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git commit -m "Release ${{ steps.get_version.outputs.version }}"
-          git tag "${{ steps.get_version.outputs.version }}"
+          git tag -a -m "Release ${{ steps.get_version.outputs.version }}" "${{ steps.get_version.outputs.version }}"
           git push --atomic --tags origin HEAD
 
   build-release:
