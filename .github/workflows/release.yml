@@ -132,7 +132,7 @@ jobs:
 
   make-release:
     name: Make release ${{ needs.tag-release.outputs.ref }}
-    needs: [build-release, tag-release]
+    needs: [build-release, tag-release, attest]
     runs-on: ubuntu-latest
     permissions:
       contents: write
