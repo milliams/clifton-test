@@ -53,10 +53,10 @@ jobs:
       - name: Install cross
         uses: taiki-e/install-action@cross
         if: matrix.cross
-      - name: Check formatting
-        run: cargo fmt --check
       - name: Linting
         run: cargo clippy
+      - name: Check formatting
+        run: cargo fmt --check
       - name: Build
         run: cargo build --target=${{ matrix.target }}
         if: ${{ ! matrix.cross }}
