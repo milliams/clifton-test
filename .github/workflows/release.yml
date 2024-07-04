@@ -2,20 +2,15 @@
 # SPDX-License-Identifier: MIT
 
 name: Build release
-run-name: Build release${{ inputs.version && format(' {0}', inputs.version) || '' }}${{ inputs.dryrun && format(' (dry run)') || '' }}
+run-name: Build release - ${{ inputs.version) }}
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: The new version, can be "patch", "minor", "major", a valid semver string or empty
+        description: The new version, can be "patch", "minor", "major", or a valid semver string
         type: string
-        default: ""
-      dryrun:
-        description: Only do the build but do not publish the release
         required: true
-        type: boolean
-        default: false
 
 permissions: {}
 
@@ -29,14 +24,9 @@ jobs:
         run: |
           echo "::error::Release must be made on the master branch"
           exit 1
-      - name: Check version is set for release
-        if: inputs.version == '' && !inputs.dryrun
-        run: |
-          echo "::error::Version must be set if not performing a dry run"
-          exit 1
       - name: Check version format
         shell: bash
-        if: ${{ !contains(fromJSON('["major", "minor", "patch"]'), inputs.version) && !inputs.dryrun}}
+        if: ${{ !contains(fromJSON('["major", "minor", "patch"]'), inputs.version) }}
         run: |
           if ! [[ '${{ inputs.version }}' =~ [[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+ ]]; then
             echo "::error::Verseion string must be a valid semver string"
@@ -54,7 +44,6 @@ jobs:
 
   tag-release:
     name: Tag release
-    if: ${{ ! inputs.dryrun }}
     needs: check
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
@@ -100,83 +89,17 @@ jobs:
 
   build-release:
     name: "Build release (${{ matrix.target }})"
-    if: ${{ needs.tag-release.result == 'success' || needs.tag-release.result == 'skipped' }}
     needs: tag-release
-    runs-on: ${{ matrix.os }}
+    uses: ./.github/workflows/build.yml
+    with:
+      ref: ${{ needs.tag-release.outputs.ref }}
+    outputs:
+      ref: "${{ needs.tag-release.outputs.ref }}"
     permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: "x86_64-unknown-linux-gnu"
-            os: "ubuntu-latest"
-            cross: false
-            output: clifton
-            asset-name: clifton-linux-x86_64
-            compress-binary: true
-          - target: "aarch64-unknown-linux-gnu"
-            os: "ubuntu-latest"
-            cross: true
-            output: clifton
-            asset-name: clifton-linux-aarch64
-            compress-binary: true
-          - target: "x86_64-pc-windows-gnu"
-            os: "ubuntu-latest"
-            cross: true
-            output: clifton.exe
-            asset-name: clifton-windows-x86_64
-            compress-binary: true
-          - target: "aarch64-apple-darwin"
-            os: "macOS-latest"
-            cross: false
-            output: clifton
-            asset-name: clifton-macos-aarch64
-            compress-binary: false
-          - target: "x86_64-apple-darwin"
-            os: "macOS-latest"
-            cross: true
-            output: clifton
-            asset-name: clifton-macos-x86_64
-            compress-binary: false
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.tag-release.outputs.ref || github.sha }}
-          fetch-tags: true
-      - name: Install toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-          target: ${{ matrix.target }}
-      - name: Install cross
-        uses: taiki-e/install-action@cross
-        if: matrix.cross
-      - name: Build
-        run: cargo build --target=${{ matrix.target }} --release
-        if: ${{ ! matrix.cross }}
-      - name: Build
-        run: cross build --target=${{ matrix.target }} --release
-        if: matrix.cross
-      - name: Rename assets
-        run: cp target/${{ matrix.target }}/release/${{ matrix.output }} ${{ matrix.asset-name }}
-      - name: Compress output
-        run: |
-          upx_ver="4.2.4"
-          wget "https://github.com/upx/upx/releases/download/v${upx_ver}/upx-${upx_ver}-amd64_linux.tar.xz"
-          tar xvf "upx-${upx_ver}-amd64_linux.tar.xz"
-          upx-${upx_ver}-amd64_linux/upx ${{ matrix.asset-name }}
-        if: ${{ matrix.compress-binary }}
-      - name: Store build artefacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.asset-name }}
-          path: |
-            ${{ matrix.asset-name }}
+      contents: read
 
   make-release:
     name: Make release ${{ needs.tag-release.outputs.ref }}
-    if: ${{ ! inputs.dryrun }}
     needs: build-release
     runs-on: ubuntu-latest
     permissions:
@@ -189,5 +112,5 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.tag-release.outputs.ref }}
+          tag_name: ${{ needs.build-release.outputs.ref }}
           files: clifton-*
