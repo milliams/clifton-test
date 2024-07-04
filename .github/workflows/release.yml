@@ -76,7 +76,7 @@ jobs:
             echo 'Updating based on explicit version'
             cargo set-version ${{ inputs.version }}
           fi
-          git add Cargo.toml
+          git add Cargo.toml Cargo.lock
       - name: Save the version
         id: get_version
         run: echo version="$(cargo metadata --format-version 1 --no-deps | jq --raw-output '.packages[0].version')" >> "${GITHUB_OUTPUT}"

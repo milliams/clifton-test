@@ -58,6 +58,7 @@ jobs:
         with:
           ref: ${{ inputs.ref || '' }}
           fetch-tags: true
+          depth: 1
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
