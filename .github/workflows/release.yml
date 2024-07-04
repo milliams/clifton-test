@@ -39,10 +39,12 @@ jobs:
             echo "::error::Verseion string must be a valid semver string"
             exit 1
           fi
+      - uses: actions/checkout@v4
+        with:
+          ref: master  # TODO maybe allow for releasing from arbitrary branches if dryrun
       - name: Record the Git ref
         id: ref
         run: echo "ref=$(git describe)" >> "${GITHUB_OUTPUT}"
-      - run: cat "${GITHUB_OUTPUT}"
 
   check:
     name: Check

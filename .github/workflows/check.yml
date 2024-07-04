@@ -10,7 +10,7 @@ on:
     inputs:
       ref:
         type: string
-        default: ${{ github.ref }}
+        default: ''
 
 permissions:
   contents: read
