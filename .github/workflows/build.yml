@@ -68,7 +68,7 @@ jobs:
         uses: taiki-e/install-action@cross
         if: matrix.cross
       - name: Install cargo-sbom
-        uses: taiki-e/install-action
+        uses: taiki-e/install-action@v2
         with:
           tool: cargo-sbom
       - name: Build
