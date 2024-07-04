@@ -108,6 +108,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: clifton-*
+      - run: pwd
+      - run: ls -l
+      - run: ls "${GITHUB_WORKSPACE}"
+      - run: tree
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
