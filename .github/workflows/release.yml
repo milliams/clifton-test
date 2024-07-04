@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 name: Build release
-run-name: Build release - ${{ inputs.version) }}
+run-name: Build release - ${{ inputs.version }}
 
 on:
   workflow_dispatch:
