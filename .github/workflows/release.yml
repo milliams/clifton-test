@@ -94,14 +94,12 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       ref: ${{ needs.tag-release.outputs.ref }}
-    outputs:
-      ref: "${{ needs.tag-release.outputs.ref }}"
     permissions:
       contents: read
 
   make-release:
     name: Make release ${{ needs.tag-release.outputs.ref }}
-    needs: build-release
+    needs: [build-release, tag-release]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -113,5 +111,5 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.build-release.outputs.ref }}
+          tag_name: ${{ needs.tag-release.outputs.ref }}
           files: clifton-*
