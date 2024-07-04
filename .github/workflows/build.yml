@@ -89,17 +89,17 @@ jobs:
           tar xvf "upx-${upx_ver}-amd64_linux.tar.xz"
           upx-${upx_ver}-amd64_linux/upx ${{ matrix.asset-name }}
         if: ${{ matrix.compress-binary }}
-      # - name: Attest SBOM  # TODO Publish the SBOM
-      #   uses: actions/attest-sbom@v1
-      #   with:
-      #     subject-path: ${{ matrix.asset-name }}
-      #     sbom-path: sbom.spdx.json
-      #   if: github.workflow == 'Build release'
-      - name: Attest binary
-        uses: actions/attest-build-provenance@v1
+      - name: Attest SBOM  # TODO Publish the SBOM
+        uses: actions/attest-sbom@v1
         with:
           subject-path: ${{ matrix.asset-name }}
+          sbom-path: sbom.spdx.json
         if: github.workflow == 'Build release'
+      # - name: Attest binary
+      #   uses: actions/attest-build-provenance@v1
+      #   with:
+      #     subject-path: ${{ matrix.asset-name }}
+      #   if: github.workflow == 'Build release'
       - name: Store build artefacts
         uses: actions/upload-artifact@v4
         with:
