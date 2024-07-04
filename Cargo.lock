@@ -120,8 +120,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4b82cf0babdbd58558212896d1a4272303a57bdb245c2bf1147185fb45640e70"
 
 [[package]]
-name = "clifton-test"
-version = "0.1.0"
+name = "clifton"
+version = "0.1.2"
 dependencies = [
  "built",
  "clap",
