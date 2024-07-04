@@ -12,6 +12,9 @@ on:
         type: string
         required: true
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+      
 permissions: {}
 
 jobs:
@@ -45,8 +48,6 @@ jobs:
   tag-release:
     name: Tag release
     needs: check
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
