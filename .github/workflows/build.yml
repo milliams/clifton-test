@@ -20,6 +20,7 @@ jobs:
     permissions:
       contents: read
       #attestations: write
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
