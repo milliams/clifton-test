@@ -61,7 +61,6 @@ jobs:
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
           target: ${{ matrix.target }}
       - name: Install cross
         uses: taiki-e/install-action@cross
