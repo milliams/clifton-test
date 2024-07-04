@@ -100,7 +100,7 @@ jobs:
 
   build-release:
     name: "Build release (${{ matrix.target }})"
-    if: ${{ always() && needs.tag-release.result == 'success' || needs.tag-release.result == 'skipped' }}
+    if: ${{ always() && (needs.tag-release.result == 'success' || needs.tag-release.result == 'skipped') }}
     needs: tag-release
     runs-on: ${{ matrix.os }}
     permissions:
