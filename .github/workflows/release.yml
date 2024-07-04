@@ -24,6 +24,11 @@ jobs:
     name: Check inputs
     runs-on: ubuntu-latest
     steps:
+      - name: Check release branch
+        if: github.ref_name != 'master'
+        run: |
+          echo "::error::Release must be made on the master branch"
+          exit 1
       - name: Check version is set for release
         if: inputs.version == '' && !inputs.dryrun
         run: |
@@ -51,6 +56,8 @@ jobs:
     name: Tag release
     if: ${{ ! inputs.dryrun }}
     needs: check
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -59,7 +66,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.ref }}  # Use ref here since we must commit on a branch
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -93,7 +100,7 @@ jobs:
 
   build-release:
     name: "Build release (${{ matrix.target }})"
-    if: ${{ always() }}
+    if: ${{ always() && needs.tag-release.result == 'success' || needs.tag-release.result == 'skipped' }}
     needs: tag-release
     runs-on: ${{ matrix.os }}
     permissions:
