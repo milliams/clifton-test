@@ -3,7 +3,13 @@
 
 name: Check
 
-on: [push, pull_request, workflow_call]
+on: 
+  push:
+  pull_request:
+  workflow_call:
+    inputs:
+      ref:
+        default: ${{ github.ref }}
 
 permissions:
   contents: read
@@ -14,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: inputs.ref
       - name: Install reuse
         run: |
           python -m venv ~/venv
@@ -44,6 +52,8 @@ jobs:
             cross: true
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: inputs.ref
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@v1
         with:
@@ -53,8 +63,6 @@ jobs:
       - name: Install cross
         uses: taiki-e/install-action@cross
         if: matrix.cross
-      #- name: Check
-      #  run: cargo check
       - name: Formatting
         run: cargo fmt --check
       - name: Linting
