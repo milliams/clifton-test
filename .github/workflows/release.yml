@@ -60,7 +60,6 @@ jobs:
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
           target: ${{ matrix.target }}
       - name: Install cargo-edit tool
         uses: taiki-e/install-action@v2
@@ -96,8 +95,40 @@ jobs:
       ref: ${{ needs.tag-release.outputs.ref }}
     permissions:
       contents: read
+
+  attest:
+    needs: build-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
       attestations: write
       id-token: write
+    steps:
+      - name: Fetch release artefacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: clifton-*
+          merge-multiple: true
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-sbom
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-sbom
+      - name: Generate SBOM
+        run: cargo sbom --output-format=spdx_json_2_3 > sbom.spdx.json
+      - name: Attest SBOM
+        uses: actions/attest-sbom@v1
+        with:
+          subject-path: clifton-*
+          sbom-path: sbom.spdx.json
+      - name: Store SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom.spdx.json
+          path: |
+            sbom.spdx.json
 
   make-release:
     name: Make release ${{ needs.tag-release.outputs.ref }}
