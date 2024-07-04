@@ -97,6 +97,7 @@ jobs:
       contents: read
 
   attest:
+    name: Attest
     needs: build-release
     runs-on: ubuntu-latest
     permissions:
@@ -118,7 +119,6 @@ jobs:
         with:
           pattern: clifton-*
           merge-multiple: true
-      - run: tree ~
       - name: Attest SBOM
         uses: actions/attest-sbom@v1
         with:
