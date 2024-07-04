@@ -24,7 +24,7 @@ jobs:
     name: Check inputs
     runs-on: ubuntu-latest
     outputs:
-      initial_ref: "${{ steps.ref.outputs.ref }}"
+      initial_ref: ${{ steps.ref.outputs.ref }}
     steps:
       - name: Check version is set for release
         if: inputs.version == '' && !inputs.dryrun
@@ -42,13 +42,14 @@ jobs:
       - name: Record the Git ref
         id: ref
         run: echo "ref=$(git describe)" >> "${GITHUB_OUTPUT}"
+      - run: cat "${GITHUB_OUTPUT}"
 
   check:
     name: Check
     needs: check-inputs
     uses: ./.github/workflows/check.yml
     with:
-      ref: "foo-${{ needs.check-inputs.outputs.initial_ref }}-bar"
+      ref: "${{ needs.check-inputs.outputs.initial_ref }}"
     permissions:
       contents: read
 
