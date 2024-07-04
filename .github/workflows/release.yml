@@ -135,7 +135,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.tag-release.outputs.ref || github.sha }}"
+          ref: ${{ needs.tag-release.outputs.ref || github.sha }}
           fetch-tags: true
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
