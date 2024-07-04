@@ -23,8 +23,6 @@ jobs:
   check-inputs:
     name: Check inputs
     runs-on: ubuntu-latest
-    outputs:
-      initial_ref: ${{ steps.ref.outputs.ref }}
     steps:
       - name: Check version is set for release
         if: inputs.version == '' && !inputs.dryrun
@@ -39,19 +37,13 @@ jobs:
             echo "::error::Verseion string must be a valid semver string"
             exit 1
           fi
-      - uses: actions/checkout@v4
-        with:
-          ref: master  # TODO maybe allow for releasing from arbitrary branches if dryrun
-      - name: Record the Git ref
-        id: ref
-        run: echo "ref=$(git describe)" >> "${GITHUB_OUTPUT}"
 
   check:
     name: Check
     needs: check-inputs
     uses: ./.github/workflows/check.yml
     with:
-      ref: "${{ needs.check-inputs.outputs.initial_ref }}"
+      ref: "${{ github.sha }}"
     permissions:
       contents: read
 
@@ -67,7 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.check_inputs.outputs.initial_ref }}
+          ref: ${{ github.sha }}
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -143,7 +135,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.tag-release.outputs.ref || needs.check_inputs.outputs.initial_ref }}"
+          ref: ${{ needs.tag-release.outputs.ref || github.sha }}"
           fetch-tags: true
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
