@@ -41,14 +41,14 @@ jobs:
           fi
       - name: Record the Git ref
         id: ref
-        run: echo ref="$(git describe)" >> "${GITHUB_OUTPUT}"
+        run: echo "ref=$(git describe)" >> "${GITHUB_OUTPUT}"
 
   check:
     name: Check
     needs: check-inputs
     uses: ./.github/workflows/check.yml
     with:
-      ref: ${{ needs.check-inputs.outputs.initial_ref }}
+      ref: "foo-${{ needs.check-inputs.outputs.initial_ref }}-bar"
     permissions:
       contents: read
 
