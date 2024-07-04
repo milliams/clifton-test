@@ -1,8 +1,8 @@
 # SPDX-FileCopyrightText: © 2024 Matt Williams <matt.williams@bristol.ac.uk>
 # SPDX-License-Identifier: MIT
 
-name: Build release
-run-name: Build release - ${{ inputs.version }}
+name: Release
+run-name: Release - ${{ inputs.version }}
 
 on:
   workflow_dispatch:
@@ -104,11 +104,6 @@ jobs:
       attestations: write
       id-token: write
     steps:
-      - name: Fetch release artefacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: clifton-*
-          merge-multiple: true
       - uses: actions/checkout@v4
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -118,6 +113,11 @@ jobs:
           tool: cargo-sbom
       - name: Generate SBOM
         run: cargo sbom --output-format=spdx_json_2_3 > sbom.spdx.json
+      - name: Fetch release artefacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: clifton-*
+          merge-multiple: true
       - run: tree ~
       - name: Attest SBOM
         uses: actions/attest-sbom@v1
