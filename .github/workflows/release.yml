@@ -129,11 +129,6 @@ jobs:
         with:
           name: sbom.spdx.json
           path: sbom.spdx.json
-      - name: Store attestation bundle
-        uses: actions/upload-artifact@v4
-        with:
-          name: attestation.jsonl
-          path: ${{ steps.attest-sbom.outputs.bundle-path }}
   
   make-release:
     name: Make release ${{ needs.tag-release.outputs.ref }}
