@@ -87,7 +87,7 @@ jobs:
       - name: Update version in changelog
         id: changelog
         run: |
-          ~/venv/bin/kacl-cli release --allow-dirty --no-commit --modify --link "https://github.com/{{ github.repository }}/releases/tag/${{ steps.get_version.outputs.version }}" "${{ steps.get_version.outputs.version }}"
+          ~/venv/bin/kacl-cli release --allow-dirty --no-commit --modify --link "https://github.com/${{ github.repository }}/releases/tag/${{ steps.get_version.outputs.version }}" "${{ steps.get_version.outputs.version }}"
           git add CHANGELOG.md
           {
             echo 'changelog<<EOF'
