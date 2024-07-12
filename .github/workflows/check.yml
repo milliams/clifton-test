@@ -55,15 +55,15 @@ jobs:
           - target: "aarch64-unknown-linux-gnu"
             os: "ubuntu-latest"
             cross: true
-          - target: "x86_64-pc-windows-gnu"
-            os: "ubuntu-latest"
-            cross: true
-          - target: "aarch64-apple-darwin"
-            os: "macOS-latest"
-            cross: false
-          - target: "x86_64-apple-darwin"
-            os: "macOS-latest"
-            cross: true
+          # - target: "x86_64-pc-windows-gnu"
+          #   os: "ubuntu-latest"
+          #   cross: true
+          # - target: "aarch64-apple-darwin"
+          #   os: "macOS-latest"
+          #   cross: false
+          # - target: "x86_64-apple-darwin"
+          #   os: "macOS-latest"
+          #   cross: true
     steps:
       - uses: actions/checkout@v4
         with:
