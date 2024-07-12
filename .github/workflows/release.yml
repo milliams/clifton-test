@@ -91,7 +91,7 @@ jobs:
           git add CHANGELOG.md
           {
             echo 'changelog<<EOF'
-            ~/venv/bin/kacl-cli get "${{ steps.get_version.outputs.version }}"
+            ~/venv/bin/kacl-cli get "${{ steps.get_version.outputs.version }}" | tail -n+2
             echo EOF
           }  >> "${GITHUB_OUTPUT}"
       - name: Tag release
