@@ -14,7 +14,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}
-      
+
 permissions: {}
 
 jobs:
@@ -144,7 +144,7 @@ jobs:
         with:
           name: sbom.spdx.json
           path: sbom.spdx.json
-  
+
   make-release:
     name: Make release ${{ needs.tag-release.outputs.ref }}
     needs: [build-release, tag-release, attest]
