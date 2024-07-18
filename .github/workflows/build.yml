@@ -46,18 +46,21 @@ jobs:
             cross: false
             output: clifton
             asset-name: clifton-macos-aarch64
-            compress-binary: true
+            compress-binary: false
           - target: "x86_64-apple-darwin"
             os: "macOS-latest"
             cross: true
             output: clifton
             asset-name: clifton-macos-x86_64
-            compress-binary: true
+            compress-binary: false
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref || '' }}
           fetch-depth: 0  # This is needed so that git-describe works properly to set the version
+      - name: install MUSL
+        if: contains(matrix.target, 'musl')
+        run: apt install musl-tool
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
