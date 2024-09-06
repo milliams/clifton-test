@@ -169,7 +169,7 @@ jobs:
       - name: Make release data file
         run: |
           mkdir site
-          echo '{"releases" : [{"version" : "'${{ needs.tag-release.outputs.ref }}'", "date" : "'$(date --iso-8601)'"}]}' > site/releases
+          echo '[{"version" : "'${{ needs.tag-release.outputs.ref }}'", "date" : "'$(date --iso-8601)'"}]' > site/releases
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
