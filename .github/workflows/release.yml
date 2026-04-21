@@ -135,6 +135,7 @@ jobs:
         with:
           pattern: clifton-*
           merge-multiple: true
+          skip-decompress: true
       - name: Attest SBOM
         uses: actions/attest@v4
         with:
@@ -160,6 +161,7 @@ jobs:
         with:
           pattern: clifton-*
           merge-multiple: true
+          skip-decompress: true
       - name: Release
         uses: softprops/action-gh-release@v3
         with:
