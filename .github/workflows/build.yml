@@ -74,7 +74,7 @@ jobs:
           MATRIX_TARGET: ${{ matrix.target }}
         if: matrix.cross
       - name: Rename assets
-        run: cp "target/${MATRIX_TARGET}/release/${MATRIX_OUTPUT}"" "${MATRIX_ASSET_NAME}"
+        run: cp "target/${MATRIX_TARGET}/release/${MATRIX_OUTPUT}" "${MATRIX_ASSET_NAME}"
         env:
           MATRIX_TARGET: ${{ matrix.target }}
           MATRIX_OUTPUT: ${{ matrix.output }}
