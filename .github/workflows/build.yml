@@ -11,6 +11,10 @@ on:
         type: string
         required: true
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions: {}
 
 jobs:
@@ -29,80 +33,63 @@ jobs:
             output: clifton
             asset-name: clifton-linux-x86_64
             compress-binary: true
-          # - target: "aarch64-unknown-linux-gnu"
-          #   os: "ubuntu-latest"
-          #   cross: true
-          #   output: clifton
-          #   asset-name: clifton-linux-aarch64
-          #   compress-binary: true
-          - target: "x86_64-unknown-linux-musl"
-            os: "ubuntu-latest"
-            cross: false
-            output: clifton
-            asset-name: clifton-linux-musl-x86_64
-            compress-binary: true
-          # - target: "aarch64-unknown-linux-musl"
-          #   os: "ubuntu-latest"
-          #   cross: true
-          #   output: clifton
-          #   asset-name: clifton-linux-musl-aarch64
-          #   compress-binary: true
-          - target: "x86_64-pc-windows-gnu"
+          - target: "aarch64-unknown-linux-gnu"
             os: "ubuntu-latest"
             cross: true
-            output: clifton.exe
-            asset-name: clifton-windows-x86_64.exe
+            output: clifton
+            asset-name: clifton-linux-aarch64
+            compress-binary: true
+          - target: "aarch64-apple-darwin"
+            os: "macOS-latest"
+            cross: false
+            output: clifton
+            asset-name: clifton-macos-aarch64
             compress-binary: false
-          # - target: "aarch64-apple-darwin"
-          #   os: "macOS-latest"
-          #   cross: false
-          #   output: clifton
-          #   asset-name: clifton-macos-aarch64
-          #   compress-binary: false
-          # - target: "x86_64-apple-darwin"
-          #   os: "macOS-latest"
-          #   cross: true
-          #   output: clifton
-          #   asset-name: clifton-macos-x86_64
-          #   compress-binary: false
-          # - target: "x86_64-unknown-freebsd"
-          #   os: "ubuntu-latest"
-          #   cross: true
-          #   output: clifton
-          #   asset-name: clifton-freebsd-x86_64
-          #   compress-binary: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           ref: ${{ inputs.ref || '' }}
           fetch-depth: 0  # This is needed so that git-describe works properly to set the version
+          persist-credentials: false
       - name: install MUSL
         if: contains(matrix.target, 'musl')
         run: sudo apt install musl-tools
       - name: Install toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          target: ${{ matrix.target }}
+        run: rustup toolchain install stable --target="${MATRIX_TARGET}"
+        env:
+          MATRIX_TARGET: ${{ matrix.target }}
       - name: Install cross
-        uses: taiki-e/install-action@cross
+        uses: taiki-e/install-action@b651345a718c8f44efa2460560b3dbf29cbd7ee1 # v2
+        with:
+          tool: cross
         if: matrix.cross
       - name: Build
-        run: cargo build --target=${{ matrix.target }} --release
+        run: cargo build --target="${MATRIX_TARGET}" --release
+        env:
+          MATRIX_TARGET: ${{ matrix.target }}
         if: ${{ ! matrix.cross }}
       - name: Build
-        run: cross build --target=${{ matrix.target }} --release
+        run: cross build --target="${MATRIX_TARGET}" --release
+        env:
+          MATRIX_TARGET: ${{ matrix.target }}
         if: matrix.cross
       - name: Rename assets
-        run: cp target/${{ matrix.target }}/release/${{ matrix.output }} ${{ matrix.asset-name }}
+        run: cp "target/${MATRIX_TARGET}/release/${MATRIX_OUTPUT}"" "${MATRIX_ASSET_NAME}"
+        env:
+          MATRIX_TARGET: ${{ matrix.target }}
+          MATRIX_OUTPUT: ${{ matrix.output }}
+          MATRIX_ASSET_NAME: ${{ matrix.asset-name }}
       - name: Compress output
         run: |
           upx_ver="5.1.1"
           wget "https://github.com/upx/upx/releases/download/v${upx_ver}/upx-${upx_ver}-amd64_linux.tar.xz"
           tar xvf "upx-${upx_ver}-amd64_linux.tar.xz"
-          upx-${upx_ver}-amd64_linux/upx ${{ matrix.asset-name }}
+          upx-${upx_ver}-amd64_linux/upx "${MATRIX_ASSET_NAME}"
+        env:
+          MATRIX_ASSET_NAME: ${{ matrix.asset-name }}
         if: ${{ matrix.compress-binary }}
       - name: Store build artefacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           path: ${{ matrix.asset-name }}
           archive: false
@@ -110,13 +97,15 @@ jobs:
         if: endswith(matrix.asset-name, '.exe')
         id: exe-zip
         run: |
-          ZIP_FILE="$(basename ${{ matrix.asset-name }} .exe).zip"
-          mv "${{ matrix.asset-name }}" "clifton.exe"
+          ZIP_FILE="$(basename ${MATRIX_ASSET_NAME} .exe).zip"
+          mv "${MATRIX_ASSET_NAME}" "clifton.exe"
           zip "${ZIP_FILE}" "clifton.exe"
           echo "ZIP_FILE=${ZIP_FILE}" >> "${GITHUB_OUTPUT}"
+        env:
+          MATRIX_ASSET_NAME: ${{ matrix.asset-name }}
       - name: Store zip artefacts
         if: steps.exe-zip.outcome == 'success'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           path: ${{ steps.exe-zip.outputs.ZIP_FILE }}
           archive: false
