@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: © 2026 Matt Williams <matt.williams@bristol.ac.uk>
+# SPDX-License-Identifier: CC0-1.0
+
 name: GitHub Actions Security Analysis with zizmor
 
 on:
@@ -21,3 +24,6 @@ jobs:
           persist-credentials: false
       - name: Run zizmor
         uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
+        with:
+          annotations: true
+          advanced-security: false
