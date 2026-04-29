@@ -31,7 +31,7 @@ jobs:
         shell: bash
         if: ${{ !contains(fromJSON('["major", "minor", "patch"]'), inputs.version) }}
         run: |
-          if ! [[ '${INPUTS_VERSION}' =~ [[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+ ]]; then
+          if ! [[ "${INPUTS_VERSION}" =~ [[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+ ]]; then
             echo "::error::Version string must be a valid semver string"
             exit 1
           fi
