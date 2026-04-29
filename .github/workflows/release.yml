@@ -179,6 +179,7 @@ jobs:
         env:
           TAG_NAME: ${{ needs.tag-release.outputs.ref }}
           NOTES: ${{ needs.tag-release.outputs.changelog }}
+          GH_TOKEN: ${{ github.token }}
       # This was last used in version 0.2.0. It should be removed at some point.
       - name: Make release data file
         run: |
