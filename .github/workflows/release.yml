@@ -74,11 +74,11 @@ jobs:
           tool: cargo-edit
       - name: Update version string
         run: |
-          echo Version input is '${INPUTS_VERSION}'
-          if [ '${VERSION_IS_BUMP}' = 'true' ]; then
+          echo Version input is "${INPUTS_VERSION}"
+          if [ "${VERSION_IS_BUMP}" = 'true' ]; then
             echo 'Setting based on update spec'
             cargo set-version --bump ${INPUTS_VERSION}
-          elif [ -n '${INPUTS_VERSION}' ]; then
+          elif [ -n "${INPUTS_VERSION}" ]; then
             echo 'Updating based on explicit version'
             cargo set-version ${INPUTS_VERSION}
           fi
@@ -113,7 +113,7 @@ jobs:
           STEPS_GET_VERSION_OUTPUTS_VERSION: ${{ steps.get_version.outputs.version }}
 
   build-release:
-    name: "Build release (${{ matrix.target }})"
+    name: "Build release"
     needs: tag-release
     uses: ./.github/workflows/build.yml
     with:
