@@ -184,7 +184,7 @@ jobs:
       - name: Make release data file
         run: |
           mkdir site
-          echo '[{"version" : "'"${NEEDS_TAG_RELEASE_OUTPUTS_REF}"'", "date" : "'$(date --iso-8601)'"}]' > site/releases
+          echo '[{"version" : "'"${NEEDS_TAG_RELEASE_OUTPUTS_REF}"'", "date" : "'"$(date --iso-8601)"'"}]' > site/releases
         env:
           NEEDS_TAG_RELEASE_OUTPUTS_REF: ${{ needs.tag-release.outputs.ref }}
       - name: Upload artifact
