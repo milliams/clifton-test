@@ -97,7 +97,7 @@ jobs:
         if: endswith(matrix.asset-name, '.exe')
         id: exe-zip
         run: |
-          ZIP_FILE="$(basename ${MATRIX_ASSET_NAME} .exe).zip"
+          ZIP_FILE="$(basename "${MATRIX_ASSET_NAME}" .exe).zip"
           mv "${MATRIX_ASSET_NAME}" "clifton.exe"
           zip "${ZIP_FILE}" "clifton.exe"
           echo "ZIP_FILE=${ZIP_FILE}" >> "${GITHUB_OUTPUT}"
