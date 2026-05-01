@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: © 2026 Matt Williams <matt.williams@bristol.ac.uk>
 # SPDX-License-Identifier: CC0-1.0
 
-name: GitHub Actions Linting
+name: Check GitHub Actions
 
 on:
   push:
@@ -13,7 +13,7 @@ permissions: {}
 
 jobs:
   actionlint:
-    name: Run zizmor
+    name: Linting
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -32,3 +32,18 @@ jobs:
           HASH: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
       - name: Run actionlint
         run: ./actionlint -color
+  zizmor:
+    name: Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Required for upload-sarif (used by zizmor-action) to upload SARIF files.
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
+        with:
+          annotations: true
+          advanced-security: false
