@@ -81,12 +81,14 @@ jobs:
           MATRIX_ASSET_NAME: ${{ matrix.asset-name }}
       - name: Compress output
         run: |
-          upx_ver="5.1.1"
-          wget "https://github.com/upx/upx/releases/download/v${upx_ver}/upx-${upx_ver}-amd64_linux.tar.xz"
-          tar xvf "upx-${upx_ver}-amd64_linux.tar.xz"
-          upx-${upx_ver}-amd64_linux/upx "${MATRIX_ASSET_NAME}"
+          wget "https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz"
+          echo "${UPX_HASH}" "upx-${UPX_VERSION}-amd64_linux.tar.xz" | sha256sum --check
+          tar xvf "upx-${UPX_VERSION}-amd64_linux.tar.xz"
+          "upx-${UPX_VERSION}-amd64_linux/upx" "${MATRIX_ASSET_NAME}"
         env:
           MATRIX_ASSET_NAME: ${{ matrix.asset-name }}
+          UPX_VERSION: "5.1.1"
+          UPX_HASH: "1ff660454227861e00772f743f66b900072116b9dc24f6ee28b97cce88a7828a"
         if: ${{ matrix.compress-binary }}
       - name: Store build artefacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
