@@ -76,9 +76,7 @@ jobs:
         if: contains(matrix.target, 'musl')
         run: sudo apt install musl-tools
       - name: Install toolchain
-        run: rustup toolchain install stable --target="${MATRIX_TARGET}" --component="clippy,rustfmt"
-        env:
-          MATRIX_TARGET: ${{ matrix.target }}
+        run: rustup toolchain install stable --target="${{ matrix.target }}" --component="clippy,rustfmt"
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
       - name: Install cross
         uses: taiki-e/install-action@7769b73c2ec98c38dfcf2e18c83cfd4880c038c1 # v2.75.27
@@ -90,17 +88,11 @@ jobs:
       - name: Linting
         run: cargo clippy
       - name: Build
-        run: cargo build --target="${MATRIX_TARGET}"
-        env:
-          MATRIX_TARGET: ${{ matrix.target }}
+        run: cargo build --target="${{ matrix.target }}"
         if: ${{ ! matrix.cross }}
       - name: Build
-        run: cross build --target="${MATRIX_TARGET}"
-        env:
-          MATRIX_TARGET: ${{ matrix.target }}
+        run: cross build --target="${{ matrix.target }}"
         if: matrix.cross
       - name: Test
-        run: cargo test --target="${MATRIX_TARGET}"
-        env:
-          MATRIX_TARGET: ${{ matrix.target }}
+        run: cargo test --target="${{ matrix.target }}"
         if: ${{ ! matrix.cross }}

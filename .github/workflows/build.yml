@@ -55,38 +55,27 @@ jobs:
         if: contains(matrix.target, 'musl')
         run: sudo apt install musl-tools
       - name: Install toolchain
-        run: rustup toolchain install stable --target="${MATRIX_TARGET}"
-        env:
-          MATRIX_TARGET: ${{ matrix.target }}
+        run: rustup toolchain install stable --target="${{ matrix.target }}"
       - name: Install cross
         uses: taiki-e/install-action@7769b73c2ec98c38dfcf2e18c83cfd4880c038c1 # v2.75.27
         with:
           tool: cross
         if: matrix.cross
       - name: Build
-        run: cargo build --target="${MATRIX_TARGET}" --release
-        env:
-          MATRIX_TARGET: ${{ matrix.target }}
+        run: cargo build --target="${{ matrix.target }}" --release
         if: ${{ ! matrix.cross }}
       - name: Build
-        run: cross build --target="${MATRIX_TARGET}" --release
-        env:
-          MATRIX_TARGET: ${{ matrix.target }}
+        run: cross build --target="${{ matrix.target }}" --release
         if: matrix.cross
       - name: Rename assets
-        run: cp "target/${MATRIX_TARGET}/release/${MATRIX_OUTPUT}" "${MATRIX_ASSET_NAME}"
-        env:
-          MATRIX_TARGET: ${{ matrix.target }}
-          MATRIX_OUTPUT: ${{ matrix.output }}
-          MATRIX_ASSET_NAME: ${{ matrix.asset-name }}
+        run: cp "target/${{ matrix.target }}/release/${{ matrix.output }}" "${{ matrix.asset-name }}"
       - name: Compress output
         run: |
           wget "https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz"
           echo "${UPX_HASH}" "upx-${UPX_VERSION}-amd64_linux.tar.xz" | sha256sum --check
           tar xvf "upx-${UPX_VERSION}-amd64_linux.tar.xz"
-          "upx-${UPX_VERSION}-amd64_linux/upx" "${MATRIX_ASSET_NAME}"
+          "upx-${UPX_VERSION}-amd64_linux/upx" "${{ matrix.asset-name }}"
         env:
-          MATRIX_ASSET_NAME: ${{ matrix.asset-name }}
           UPX_VERSION: "5.1.1"
           UPX_HASH: "1ff660454227861e00772f743f66b900072116b9dc24f6ee28b97cce88a7828a"
         if: ${{ matrix.compress-binary }}
@@ -99,12 +88,10 @@ jobs:
         if: endswith(matrix.asset-name, '.exe')
         id: exe-zip
         run: |
-          ZIP_FILE="$(basename "${MATRIX_ASSET_NAME}" .exe).zip"
-          mv "${MATRIX_ASSET_NAME}" "clifton.exe"
+          ZIP_FILE="$(basename "${{ matrix.asset-name }}" .exe).zip"
+          mv "${{ matrix.asset-name }}" "clifton.exe"
           zip "${ZIP_FILE}" "clifton.exe"
           echo "ZIP_FILE=${ZIP_FILE}" >> "${GITHUB_OUTPUT}"
-        env:
-          MATRIX_ASSET_NAME: ${{ matrix.asset-name }}
       - name: Store zip artefacts
         if: steps.exe-zip.outcome == 'success'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
