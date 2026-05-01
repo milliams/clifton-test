@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: © 2026 Matt Williams <matt.williams@bristol.ac.uk>
+# SPDX-License-Identifier: CC0-1.0
+
+name: GitHub Actions Linting
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["**"]
+
+permissions: {}
+
+jobs:
+  actionlint:
+    name: Run zizmor
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Download actionlint
+        run: |
+          wget "https://github.com/rhysd/actionlint/releases/download/v${VERSION}/actionlint_${VERSION}_linux_amd64.tar.gz"
+          echo "${HASH}" "actionlint_${VERSION}_linux_amd64.tar.gz" | sha256sum --check
+          tar xvf "actionlint_${VERSION}_linux_amd64.tar.gz"
+        env:
+          VERSION: "1.7.12"
+          HASH: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+      - name: Run actionlint
+        run: ./actionlint -color
